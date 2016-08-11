@@ -18,6 +18,6 @@ export default class extends BaseModel {
         id: {type: 'integer', primaryKey: true, autoIncrement: true},
         staynum: {type: 'integer'},//入住
         totalnum: {type: 'integer'},//总数
-        daytime: {type: 'daytime'}//
+        daytime: {type: 'datetime'}//
     }
 };

@@ -1,5 +1,5 @@
 /**
- * pparkingmg.js
+ * hcustomer.js
  *
  * @description :: 入住客户信息信息表
  *
@@ -13,7 +13,7 @@ export default class extends BaseModel {
     super();
   }
 
-  static tableName = 'pparkingmg';
+  static tableName = 'hcustomer';
   static attributes = {
         id: {type: 'integer', primaryKey: true, autoIncrement: true},//停车场Id
         h_r_id: {type: 'string', unique: true,required:true},//房间ID
@@ -26,12 +26,12 @@ export default class extends BaseModel {
         cardno: {type: 'string'},//卡号ID
         intime : {type: 'datetime'},// 入住时间
         outime  : {type: 'datetime'},//预计离房时间
-        actuallefttime  : {type: 'datetime'},//实际离开时间 
-        deposit : {type: 'float'},//押金 
+        actuallefttime  : {type: 'datetime'},//实际离开时间
+        deposit : {type: 'float'},//押金
         cost  : {type: 'float'},//消费金额
         loss  : {type: 'float'},//损耗金额
         discount : {type: 'float'},// 优惠金额
-        totalmoney  : {type: 'float'},//总费用 
+        totalmoney  : {type: 'float'},//总费用
         costtype: {type: 'string'},//消费方式
         status : {type: 'string'},// 客户入住状态
         remark  : {type: 'string'},//备注
