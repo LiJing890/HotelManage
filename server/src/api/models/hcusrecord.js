@@ -19,6 +19,5 @@ export default class extends BaseModel {
         h_customer_id: {type: 'string'},//客户入住信息ID
         h_roomconfig_id: {type: 'string'},//房间配置赔偿标准ID
         num: {type: 'integer'}//损坏数量
-
     }
 };

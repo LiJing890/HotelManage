@@ -35,14 +35,6 @@ export default class extends BaseModel {
         costtype: {type: 'string'},//消费方式
         status : {type: 'string'},// 客户入住状态
         remark  : {type: 'string'},//备注
-        create_by: {type: 'string'},//创建人
-        create_name: {type: 'string'},//创建人名称
-        create_date: {type: 'datetime'},//创建时间
-        update_by: {type: 'string'},//修改人
-        update_name: {type: 'string'},//修改人名称
-        update_date: {type: 'datetime'},//修改时间
-        delflag: {type: 'string'},//删除标志
-        del_date: {type: 'datetime'},//删除时间
         hycode: {type: 'integer'},//hycode
         hecode: {type: 'integer'},//hecode
         ktamt: {type: 'integer'},//ktamt

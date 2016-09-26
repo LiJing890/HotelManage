@@ -18,6 +18,5 @@ export default class extends BaseModel {
         id: {type: 'integer', primaryKey: true, autoIncrement: true},//车位Id
         housceamt: {type: 'float'},//客房优惠
         htime: {type: 'datetime'}//客房结算时间
-
     }
 };

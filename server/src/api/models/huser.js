@@ -1,8 +1,8 @@
 /**
 /**
- * hbuilding.js
+ * hbook.js
  *
- * @description :: 楼栋信息表
+ * @description :: 客户预订信息表
  *
  * Created by libinqi on 2016/7/3.
  */
@@ -14,14 +14,10 @@ export default class extends BaseModel {
     super();
   }
 
-  static tableName = 'hbuilding';
+  static tableName = 'huser';
   static attributes = {
         id: {type: 'integer', primaryKey: true, autoIncrement: true},//Id
-        bcode: {type: 'string'},//楼栋编码
-        bname: {type: 'string'},//楼栋名称
-        bheight: {type: 'string'},//楼栋层数
-        bplace: {type: 'string'}//楼栋位置
-
-
+        name: {type: 'string'},//姓名
+        isadmin: {type: 'boolean'}//是否管理员
     }
 };
