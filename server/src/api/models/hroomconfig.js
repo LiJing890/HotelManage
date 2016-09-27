@@ -16,8 +16,9 @@ export default class extends BaseModel {
   static tableName = 'hroomconfig';
   static attributes = {
         id: {type: 'integer', primaryKey: true, autoIncrement: true},
-        rctype: {type: 'string'},//类型
+        rctype: {type: 'string'},//类型  0消耗品 1 家具
         rcname: {type: 'string'},//名称
+        rccode: {type: 'string'},//编码
         rcprice: {type: 'float'},//采购价格
         rcdamageprice: {type: 'float'},//损坏赔偿价格
         remark: {type: 'string'}//备注

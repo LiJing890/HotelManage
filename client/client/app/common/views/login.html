@@ -245,22 +245,24 @@
           localStorage.removeItem('uu');
         }
 
-        userService.userLogin(username, password, function(data, error) {
-          if (data) {
-            user = data;
-            userService.getUserPermissions(function(data) {
-              userService.setUser(data);
-              window.location.href = '/';
-              //                    if (win) {
-              //                        win.width = 1024;
-              //                        win.height = 768;
-              //                        win.setPosition("center");
-              //                    }
-            });
-          } else {
-            $('#error').text(error);
-          }
-        });
+        window.location.href = '/';
+
+        // userService.userLogin(username, password, function(data, error) {
+        //   if (data) {
+        //     user = data;
+        //     userService.getUserPermissions(function(data) {
+        //       userService.setUser(data);
+        //       window.location.href = '/';
+        //       //                    if (win) {
+        //       //                        win.width = 1024;
+        //       //                        win.height = 768;
+        //       //                        win.setPosition("center");
+        //       //                    }
+        //     });
+        //   } else {
+        //     $('#error').text(error);
+        //   }
+        // });
       }
 
       function logout() {

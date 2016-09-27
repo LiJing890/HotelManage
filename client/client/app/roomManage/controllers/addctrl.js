@@ -1,7 +1,7 @@
 'use strict';
 
 var rcconfigController=angular.module('roomManageApp');
-rcconfigController.controller('roomModelctrl',['$scope','$filter','settingService','dialog',function ($scope,$filter,settingService,dialog) {
+rcconfigController.controller('roomModelctrl',['$scope','$filter','settingService','dialog','$sails',function ($scope,$filter,settingService,dialog,$sails) {
 	$scope.roomconfig=[];
 	$scope.roomconfigj=[];
 	$scope.jsondata={rtname:'',rtcode:'',rtdprice:'',rthprice:''};
@@ -56,68 +56,92 @@ rcconfigController.controller('roomModelctrl',['$scope','$filter','settingServic
 			});
 	}, true);
 	$scope.getroomconfigs=function(){
-		settingService.getRcList({"rows":"999","pages":"1","rctype":"2"}).then(function(data){
-			if (data.data.code==200) {
-				var list=[];
-				for (var i = data.data.body.data.length - 1; i >= 0; i--) {
-					list=data.data.body.data[i];
-					list.rcsum=0;
-					list.ischecked=false;
-					list.rtconfignum="";
-					$scope.roomconfigj.push(list);
-				};
-				
-				settingService.getRcList({"rows":"999","pages":"1","rctype":"1"}).then(function(data){
-					if (data.data.code==200) {
-						var listx=[];
-						for (var i = data.data.body.data.length - 1; i >= 0; i--) {
-							listx=data.data.body.data[i];
-							listx.rcsum=0;
-							listx.ischecked=false;
-							listx.rtconfignum="";
-							$scope.roomconfig.push(listx);
-						};
 
-						if ($scope.updateId!="") {
-							settingService.getRoomModelById($scope.updateId).then(function(datamodel){
-								if (datamodel.data.code==200) {
-									$scope.jsondata.rtname=datamodel.data.body.rtname;
-									$scope.jsondata.rtcode=datamodel.data.body.rtcode;
-									$scope.jsondata.rtdprice=datamodel.data.body.rtdprice;
-									$scope.jsondata.rthprice=datamodel.data.body.rthprice;
-									if (datamodel.data.body.rtconfigids==null) {
-										return;
-									};
-									var rcs = datamodel.data.body.rtconfigids.split(',');
-									var rcsums = datamodel.data.body.rtconfignum.split(',');
-									for (var i = rcs.length - 1; i >= 0; i--) {
-										for (var j = $scope.roomconfigj.length - 1; j >= 0; j--) {
-											if(rcs[i] ==$scope.roomconfigj[j].id){
-												$scope.roomconfigj[j].ischecked= true;
-												$scope.roomconfigj[j].rtconfignum=rcsums[i];
-											}
-										};
-										for (var k = $scope.roomconfig.length - 1; k >= 0; k--) {
-											if(rcs[i] ==$scope.roomconfig[k].id){
-												$scope.roomconfig[k].ischecked= true;
-												$scope.roomconfig[k].rtconfignum=rcsums[i];
-											}
-										};
-									};
 
-								}else{
-									$scope.jsondata=null;
-								};
-							});
-						}else{
-							$scope.jsondata={rtname:'',rtcode:'',rtdprice:'',rthprice:''};
-						};
-					};
-					return null;
-				});
-};
-return null;
+		$sails.get("/hroomconfig?rctype=1")
+	.success(function (data) {
+		var list=[];
+		for (var i = data.length - 1; i >= 0; i--) {
+			list=data[i];
+			list.rcsum=0;
+			list.ischecked=false;
+			list.rtconfignum="";
+			$scope.roomconfigj.push(list);
+		};
+	})
+	.error(function (data) {
+		alert('error');
+	});
+
+	$sails.get("/hroomconfig?rctype=0")
+.success(function (data) {
+	var list=[];
+	for (var i = data.length - 1; i >= 0; i--) {
+		list=data[i];
+		list.rcsum=0;
+		list.ischecked=false;
+		list.rtconfignum="";
+		$scope.roomconfig.push(list);
+	};
+})
+.error(function (data) {
+	alert('error');
 });
+// 		settingService.getRcList({"rows":"999","pages":"1","rctype":"2"}).then(function(data){
+// 			if (data.data.code==200) {
+//
+//
+// 				settingService.getRcList({"rows":"999","pages":"1","rctype":"1"}).then(function(data){
+// 					if (data.data.code==200) {
+// 						var listx=[];
+// 						for (var i = data.data.body.data.length - 1; i >= 0; i--) {
+// 							listx=data.data.body.data[i];
+// 							listx.rcsum=0;
+// 							listx.ischecked=false;
+// 							listx.rtconfignum="";
+// 							$scope.roomconfig.push(listx);
+// 						};
+//
+// 						if ($scope.updateId!="") {
+// 							settingService.getRoomModelById($scope.updateId).then(function(datamodel){
+// 								if (datamodel.data.code==200) {
+// 									$scope.jsondata.rtname=datamodel.data.body.rtname;
+// 									$scope.jsondata.rtcode=datamodel.data.body.rtcode;
+// 									$scope.jsondata.rtdprice=datamodel.data.body.rtdprice;
+// 									$scope.jsondata.rthprice=datamodel.data.body.rthprice;
+// 									if (datamodel.data.body.rtconfigids==null) {
+// 										return;
+// 									};
+// 									var rcs = datamodel.data.body.rtconfigids.split(',');
+// 									var rcsums = datamodel.data.body.rtconfignum.split(',');
+// 									for (var i = rcs.length - 1; i >= 0; i--) {
+// 										for (var j = $scope.roomconfigj.length - 1; j >= 0; j--) {
+// 											if(rcs[i] ==$scope.roomconfigj[j].id){
+// 												$scope.roomconfigj[j].ischecked= true;
+// 												$scope.roomconfigj[j].rtconfignum=rcsums[i];
+// 											}
+// 										};
+// 										for (var k = $scope.roomconfig.length - 1; k >= 0; k--) {
+// 											if(rcs[i] ==$scope.roomconfig[k].id){
+// 												$scope.roomconfig[k].ischecked= true;
+// 												$scope.roomconfig[k].rtconfignum=rcsums[i];
+// 											}
+// 										};
+// 									};
+//
+// 								}else{
+// 									$scope.jsondata=null;
+// 								};
+// 							});
+// 						}else{
+// 							$scope.jsondata={rtname:'',rtcode:'',rtdprice:'',rthprice:''};
+// 						};
+// 					};
+// 					return null;
+// 				});
+// };
+// return null;
+// });
 };
 $scope.cancel = function(){
 	$scope.closeThisDialog(null);
@@ -169,6 +193,6 @@ $scope.update = function(){
 	}else{
 		 $scope.myForm.submitted = true;
 	}
-};	
+};
 $scope.getroomconfigs();
 }]);

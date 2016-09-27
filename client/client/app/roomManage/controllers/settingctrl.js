@@ -2,26 +2,34 @@
 
 var dialogController=angular.module('roomManageApp');
 
-dialogController.controller('settingctrl',['$scope','$http','dialog', 'settingService',function ($scope, $http,dialog,settingService) {
+dialogController.controller('settingctrl',['$scope','$http','dialog', 'settingService','$sails',function ($scope, $http,dialog,settingService,$sails) {
 
     $scope.updateId="";
     $scope.roomModellist=[];
      // 重新获取数据条目
      $scope.reGetProducts = function(){
             // 发送给后台的请求数据
-            var postData = {
-              page: $scope.paginationConf.totalItems==0?1:$scope.paginationConf.currentPage,
-              rows: $scope.paginationConf.itemsPerPage
-              
-          };
-          settingService.getroommodels().then(function (response) {
-           if (response.status==200) {
-            $scope.roomModellist=response.data.body.data;
-            $scope.paginationConf.totalItems = response.data.body.totalRecords;
-        }else{
-                    //暂无数据。
-                };
-            });
+          //   var postData = {
+          //     page: $scope.paginationConf.totalItems==0?1:$scope.paginationConf.currentPage,
+          //     rows: $scope.paginationConf.itemsPerPage
+          //
+          // };
+
+          $sails.get("/hroomtype")
+        .success(function (data) {
+            $scope.roomModellist = data;
+        })
+        .error(function (data) {
+          alert('error');
+        });
+        //   settingService.getroommodels().then(function (response) {
+        //    if (response.status==200) {
+        //     $scope.roomModellist=response.data.body.data;
+        //     $scope.paginationConf.totalItems = response.data.body.totalRecords;
+        // }else{
+        //             //暂无数据。
+        //         };
+        //     });
       };
 
       $scope.clickToOpenmodel = function () {
@@ -69,7 +77,7 @@ dialogController.controller('settingctrl',['$scope','$http','dialog', 'settingSe
             //以下实际应用中可注释
            // totalItems:800
        };
-
+       $scope.reGetProducts();
         // 通过$watch currentPage和itemperPage 当他们一变化的时候，重新获取数据条目
         $scope.$watch('paginationConf.currentPage + paginationConf.itemsPerPage', $scope.reGetProducts);
     }]);
