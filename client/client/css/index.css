@@ -1,4 +1,4 @@
-html,body{background:#fff; font-family: Microsoft YaHei; -webkit-user-select: none;overflow: hidden;font-size: 14px;  -webkit-font-smoothing: antialiased;}
+html,body{background:#fff; font-family: Microsoft YaHei; -webkit-user-select: none;overflow: hidden;font-size: 12px;  -webkit-font-smoothing: antialiased;}
 div,a,ul,li,span,button{list-style: none;border:none;}
 /*颜色*/
 .park-orange{background: #f5884c;}
@@ -173,7 +173,7 @@ label{font-size: 12px;}
  @media screen and (max-height:900px){
  	.ngdialog.ngdialog-theme-default{padding-top:64px; transition:all 0.3s;}
  }
- 
+
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
