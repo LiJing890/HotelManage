@@ -148,6 +148,12 @@ angular.module('roomManageApp', [
         (function () {
             var currentAppModule = null;
             $rootScope.roomMenus = [];
+            var user = {
+              id:1,
+              username:"admin",
+                password:"123456"
+            };
+            $rootScope.user = user;
             // 获取本应用模块
 
             var loadAppModule = function () {

@@ -2,13 +2,14 @@
 
 var app=angular.module('roomManageApp');
 
-app.controller('roomfloorlist',['$scope','$http','dialog','roomCheckServices',function ($scope, $http, dialog,roomCheckServices) {
+app.controller('roomfloorlist',['$scope','$http','dialog','$sails',function ($scope, $http, dialog,$sails) {
 	var vm = this;
   vm.hotelBuild = [];
+	vm.hotelFloorList = [];
+	vm.hotelRoomList = [];
+
   vm.start = 0;
 	  vm.queryHotelRoom = {
-    page:'1',
-    rows:'999',
     h_f_id:"",
     rid:"",
     order:'roomno',
@@ -16,58 +17,92 @@ app.controller('roomfloorlist',['$scope','$http','dialog','roomCheckServices',fu
   };
     //楼栋查询
     vm.getHotelBuildList = function(){
-    	roomCheckServices.getHotelBuildList().then(function (response) {
-    		if(response.data.code == "200"){
-    			vm.hotelBuildList = response.data.body.data;
-          if(vm.hotelBuild.length <= 0){
-    			  vm.hotelBuild = response.data.body.data[0];
-          }
-    			// vm.getHotelFloorList(vm.hotelBuild.id);
-          vm.activeHotelBuild(vm.hotelBuild);
-    		}
-    	});
+			$sails.get("/hbuilding")
+    .success(function (data) {
+       vm.hotelBuildList = data;
+			 if(vm.hotelBuild.length <= 0){
+     			  vm.hotelBuild = data[0];
+           }
+					 vm.getHotelFloorList(vm.hotelBuild.id);
+		           vm.activeHotelBuild(vm.hotelBuild);
+    })
+    .error(function (data) {
+      dialog.notify(data.msg, 'error');
+    });
+    	// roomCheckServices.getHotelBuildList().then(function (response) {
+    	// 	if(response.data.code == "200"){
+    	// 		vm.hotelBuildList = response.data.body.data;
+      //     if(vm.hotelBuild.length <= 0){
+    	// 		  vm.hotelBuild = response.data.body.data[0];
+      //     }
+    	// 		// vm.getHotelFloorList(vm.hotelBuild.id);
+      //     vm.activeHotelBuild(vm.hotelBuild);
+    	// 	}
+    	// });
     };
 
   //楼层查询
   vm.getHotelFloorList = function(hotelBuildid){
-  	roomCheckServices.getHotelFloorList(hotelBuildid).then(function (response) {
-  		if(response.data.code == "200"){
-  			vm.hotelFloorList = response.data.body.data;
-  			vm.hotelFloor = response.data.body.data[0];
-  			vm.getHotelRoomList(vm.hotelFloor.id);
-  		}
-  	});
+		$sails.get("/hfloor?h_b_id="+hotelBuildid)
+	.success(function (data) {
+		vm.hotelFloorList = data;
+		if(data.length>0){
+			vm.hotelFloor = data[0];
+			vm.getHotelRoomList(vm.hotelFloor.id);
+		}else{
+			vm.hotelRoomList = [];
+		}
+
+	})
+	.error(function (data) {
+		dialog.notify(data.msg, 'error');
+	});
+  	// roomCheckServices.getHotelFloorList(hotelBuildid).then(function (response) {
+  	// 	if(response.data.code == "200"){
+  	// 		vm.hotelFloorList = response.data.body.data;
+  	// 		vm.hotelFloor = response.data.body.data[0];
+  	// 		vm.getHotelRoomList(vm.hotelFloor.id);
+  	// 	}
+  	// });
   };
     //房间查询
   vm.getHotelRoomList = function(hotelFloorid){
-    vm.queryHotelRoom.h_f_id = hotelFloorid;
-    roomCheckServices.getHotelRoomList(vm.queryHotelRoom).then(function (response) {
-      if(response.data.code == "200"){
-        // vm.hotelRoomList = [];
-				//
-        // var data = response.data.body.data;
-				//
-        // var row = 0;
-        // var count = data.length;
-        // var group = count / 5;
-        // for (var i = 0;i< group; i++) {
-        //   var gp = {
-        //     item : i,
-        //     data : []
-        //   };
-        //   for (var j = 0; j < 5; j++) {
-        //     if(data[row] != null){
-        //       data[row].row = row;
-        //       gp.data.push(data[row]);
-        //     }
-        //     row++;
-        //   };
-        //   vm.hotelRoomList.push(gp);
-        // }
-				// 取消分组
-				vm.hotelRoomList = response.data.body.data;
-      }
-    })
+		$sails.get("/hroom?h_f_id="+hotelFloorid)
+	.success(function (data) {
+		vm.hotelRoomList = data;
+
+	})
+	.error(function (data) {
+		dialog.notify(data.msg, 'error');
+	});
+    // vm.queryHotelRoom.h_f_id = hotelFloorid;
+    // roomCheckServices.getHotelRoomList(vm.queryHotelRoom).then(function (response) {
+    //   if(response.data.code == "200"){
+    //     // vm.hotelRoomList = [];
+		// 		//
+    //     // var data = response.data.body.data;
+		// 		//
+    //     // var row = 0;
+    //     // var count = data.length;
+    //     // var group = count / 5;
+    //     // for (var i = 0;i< group; i++) {
+    //     //   var gp = {
+    //     //     item : i,
+    //     //     data : []
+    //     //   };
+    //     //   for (var j = 0; j < 5; j++) {
+    //     //     if(data[row] != null){
+    //     //       data[row].row = row;
+    //     //       gp.data.push(data[row]);
+    //     //     }
+    //     //     row++;
+    //     //   };
+    //     //   vm.hotelRoomList.push(gp);
+    //     // }
+		// 		// 取消分组
+		// 		vm.hotelRoomList = response.data.body.data;
+    //   }
+    // })
   }
 
   //当班收取押金和开房数
@@ -115,25 +150,43 @@ app.controller('roomfloorlist',['$scope','$http','dialog','roomCheckServices',fu
   vm.clickToDeleteRoom = function (room) {
     dialog.confirmDialog('确认是否要删除房间[' + room.roomno + ']?').then(function (data) {
       if (data) {
-        $http.delete(lpt_host + '/zeus/ws/hotel/hRoom/delete/' + room.id)
-        .success(function(data){
-          if(data != null && data.code=="200"){
-            vm.getHotelRoomList(vm.hotelFloor.id);
-            dialog.notify('删除成功！', 'success');
-          }
-        });
+				$sails.delete("/hroom/"+ room.id)
+			.success(function (data) {
+				vm.getHotelRoomList(vm.hotelFloor.id);
+				dialog.notify('删除成功！', 'success');
+			})
+			.error(function (data) {
+				dialog.notify(data.msg, 'error');
+			});
+        // $http.delete(lpt_host + '/zeus/ws/hotel/hRoom/delete/' + room.id)
+        // .success(function(data){
+        //   if(data != null && data.code=="200"){
+        //     vm.getHotelRoomList(vm.hotelFloor.id);
+        //     dialog.notify('删除成功！', 'success');
+        //   }
+        // });
       }
     });
   }
   vm.clickToDeleteBuilding=function(building){
   	dialog.confirmDialog('确认是否要删除['+ building.bname +']?').then(function (data) {
       if (data) {
-        $http.delete(lpt_host + '/zeus/ws/hotel/hBuilding/delete/' + building.id)
-        .success(function(data){
-          vm.hotelBuild = [];
-          vm.getHotelBuildList();
-          dialog.notify('删除成功！', 'success');
-        });
+				$sails.delete("/hbuilding/"+ building.id)
+			.success(function (data) {
+				vm.hotelBuild = [];
+				vm.getHotelBuildList();
+				dialog.notify('删除成功！', 'success');
+			})
+			.error(function (data) {
+				dialog.notify(data.msg, 'error');
+			});
+
+        // $http.delete(lpt_host + '/zeus/ws/hotel/hBuilding/delete/' + building.id)
+        // .success(function(data){
+        //   vm.hotelBuild = [];
+        //   vm.getHotelBuildList();
+        //   dialog.notify('删除成功！', 'success');
+        // });
       }
     });
   };
@@ -183,8 +236,8 @@ vm.downFloor = function(){
 	        //   return true;
 	        // }
 	        // return false;
-	        if(data!=null && data.code == "200"){
-            vm.hotelBuild = data.body;
+	        if(data!=null){
+            vm.hotelBuild = data;
 	        	vm.getHotelBuildList();
 	        }
 	    }
@@ -201,7 +254,7 @@ vm.downFloor = function(){
 	        //   return true;
 	        // }
 	        // return false;
-	        if(data!=null && data.code == "200"){
+	        if(data!=null){
 	        	vm.getHotelBuildList();
 	        }
 	    }
@@ -218,7 +271,7 @@ vm.downFloor = function(){
 	        //   return true;
 	        // }
 	        // return false;
-	        if(data!=null && data.code == "200"){
+	        if(data!=null){
 	        	vm.getHotelBuildList();
 	        }
 	    }
@@ -298,12 +351,10 @@ vm.downFloor = function(){
   };
   vm.BatchDel=function(){
     var delItem=[];
-    angular.forEach(vm.hotelRoomList, function(item){
-      angular.forEach(item.data, function(data){
+    angular.forEach(vm.hotelRoomList, function(data){
         if(data.issel==true){
           delItem.push(data);
         }
-      })
     })
 
     if (delItem.length>0) {
@@ -311,14 +362,23 @@ vm.downFloor = function(){
           if (data) {
             var delbatch = false;
             for (var i = 0; i < delItem.length; i++) {
-              $http.delete(lpt_host + '/zeus/ws/hotel/hRoom/delete/' + delItem[i].id)
-                .success(function(data){
-                  if(data != null && data.code=="200"){
-                    delbatch = true;
-                    // dialog.notify('删除成功！', 'success');
-                    vm.getHotelRoomList(vm.hotelFloor.id);
-                  }
-                });
+							$sails.delete("/hroom/"+ delItem[i].id)
+						.success(function (data) {
+							delbatch = true;
+							vm.getHotelRoomList(vm.hotelFloor.id);
+						})
+						.error(function (data) {
+							dialog.notify(data.msg, 'error');
+						});
+							// 
+              // $http.delete(lpt_host + '/zeus/ws/hotel/hRoom/delete/' + delItem[i].id)
+              //   .success(function(data){
+              //     if(data != null && data.code=="200"){
+              //       delbatch = true;
+              //       // dialog.notify('删除成功！', 'success');
+              //       vm.getHotelRoomList(vm.hotelFloor.id);
+              //     }
+              //   });
             }
             dialog.notify('房间删除成功！', 'success');
           }
@@ -331,15 +391,23 @@ vm.downFloor = function(){
   vm.Delfloor=function(floor){
       dialog.confirmDialog('确认是否要删除楼层[' + floor.floor + ']?').then(function (data) {
       if (data) {
-        $http.delete(lpt_host + '/zeus/ws/hotel/hFloor/delete/' + floor.id)
-        .success(function(data){
-          if(data != null && data.code=="200"){
-            vm.getHotelBuildList();
-            dialog.notify('楼层删除成功！', 'success');
-          }else{
-             dialog.notify(data.msg, 'error');
-          }
-        });
+				$sails.delete("/hfloor/"+ floor.id)
+			.success(function (data) {
+				vm.getHotelBuildList();
+				dialog.notify('楼层删除成功！', 'success');
+			})
+			.error(function (data) {
+				dialog.notify(data.msg, 'error');
+			});
+        // $http.delete(lpt_host + '/zeus/ws/hotel/hFloor/delete/' + floor.id)
+        // .success(function(data){
+        //   if(data != null && data.code=="200"){
+        //     vm.getHotelBuildList();
+        //     dialog.notify('楼层删除成功！', 'success');
+        //   }else{
+        //      dialog.notify(data.msg, 'error');
+        //   }
+        // });
       }
     });
   };
@@ -367,6 +435,6 @@ vm.downFloor = function(){
   };
   // vm.getHotelRoomtypeList();
   vm.getHotelBuildList();
-  vm.getCustomerInOutNum();
-  vm.getRoomStatic();
+  // vm.getCustomerInOutNum();
+  // vm.getRoomStatic();
 }]);

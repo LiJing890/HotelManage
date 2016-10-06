@@ -18,7 +18,6 @@ angular.module('lptApp', [
     //            .otherwise('/opCenter');
     $sailsProvider.url ='http://localhost:1304';
     $locationProvider.html5Mode(true);
-
     ngDialogProvider.setDefaults({
       className: 'ngdialog-theme-default',
       plain: false,
