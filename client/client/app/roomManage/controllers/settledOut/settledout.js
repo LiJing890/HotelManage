@@ -2,12 +2,10 @@
 
 var app=angular.module('roomManageApp');
 
-app.controller('settledoutmain',['$scope','$http','dialog','roomCheckServices', 'settingService', '$location',function ($scope, $http, dialog, roomCheckServices, settingService, $location) {
+app.controller('settledoutmain',['$scope','$http','dialog','$sails', '$location',function ($scope, $http, dialog, $sails, $location) {
   var vm = this;
 
   vm.queryHotelRoom = {
-    page:'1',
-    rows:'999',
     h_f_id:"",
     rid:"",
     rstatus:"",
@@ -22,73 +20,115 @@ app.controller('settledoutmain',['$scope','$http','dialog','roomCheckServices', 
 
   //房间类型查询
   vm.getHotelRoomtypeList = function(){
-    roomCheckServices.getHotelRoomtypeList(vm.queryHotelRoomType).then(function (response) {
-      if(response.data.code == "200"){
-        vm.hotelRoomtypeList = response.data.body.data;
-      }
-    });
+    $sails.get("/hroomtype")
+  .success(function (data) {
+      vm.hotelRoomtypeList = data;
+  })
+  .error(function (data) {
+    alert('error');
+  });
+    // roomCheckServices.getHotelRoomtypeList(vm.queryHotelRoomType).then(function (response) {
+    //   if(response.data.code == "200"){
+    //     vm.hotelRoomtypeList = response.data.body.data;
+    //   }
+    // });
   }
 
   //楼栋查询
   vm.getHotelBuildList = function(){
-    roomCheckServices.getHotelBuildList().then(function (response) {
-      if(response.data.code == "200"){
-        vm.hotelBuildList = response.data.body.data;
-        vm.hotelBuild = response.data.body.data[0];
-        vm.getHotelFloorList(vm.hotelBuild.id);
-      }
-    });
+    $sails.get("/hbuilding")
+  .success(function (data) {
+     vm.hotelBuildList = data;
+    vm.hotelBuild = data[0];
+    vm.getHotelFloorList(vm.hotelBuild.id);
+  })
+  .error(function (data) {
+    dialog.notify(data.msg, 'error');
+  });
+
+
+    // roomCheckServices.getHotelBuildList().then(function (response) {
+    //   if(response.data.code == "200"){
+    //     vm.hotelBuildList = response.data.body.data;
+    //     vm.hotelBuild = response.data.body.data[0];
+    //     vm.getHotelFloorList(vm.hotelBuild.id);
+    //   }
+    // });
   }
 
   //楼层查询
   vm.getHotelFloorList = function(hotelBuildid){
-    roomCheckServices.getHotelFloorList(hotelBuildid).then(function (response) {
-      if(response.data.code == "200"){
-        vm.hotelFloorList = response.data.body.data;
-        vm.hotelFloor = response.data.body.data[0];
-        vm.getHotelRoomList(vm.hotelFloor.id);
-      }
-    });
+    $sails.get("/hfloor?h_b_id="+hotelBuildid)
+	.success(function (data) {
+		vm.hotelFloorList = data;
+		if(data.length>0){
+			vm.hotelFloor = data[0];
+			vm.getHotelRoomList(vm.hotelFloor.id);
+		}else{
+			vm.hotelRoomList = [];
+		}
+
+	})
+	.error(function (data) {
+		dialog.notify(data.msg, 'error');
+	});
+    // roomCheckServices.getHotelFloorList(hotelBuildid).then(function (response) {
+    //   if(response.data.code == "200"){
+    //     vm.hotelFloorList = response.data.body.data;
+    //     vm.hotelFloor = response.data.body.data[0];
+    //     vm.getHotelRoomList(vm.hotelFloor.id);
+    //   }
+    // });
   }
 
   //房间查询
   vm.getHotelRoomList = function(hotelFloorid){
     vm.queryHotelRoom.h_f_id = hotelFloorid;
-    roomCheckServices.getHotelRoomList(vm.queryHotelRoom).then(function (response) {
-      if(response.data.code == "200"){
-        vm.hotelRoomList = [];
+    $sails.get("/hroom?h_f_id="+hotelFloorid)
+	.success(function (data) {
+		vm.hotelRoomList = data;
 
-        // var hrl = response.data.body.data;
-        // var dhrl={};
-        // var data = [];
-        // for (var i = hrl.length - 1; i >= 0; i--) {
-        //     var dhrl=hrl[i];
-        //     dhrl.issel=false;
-        //     data.push(dhrl)
-        // };
+	})
+	.error(function (data) {
+		dialog.notify(data.msg, 'error');
+	});
 
 
-        vm.hotelRoomList = response.data.body.data;
-
-        // var row = 0;
-        // var count = data.length;
-        // var group = count / 5;
-        // for (var i = 0;i< group; i++) {
-        //   var gp = {
-        //     item : i,
-        //     data : []
-        //   };
-        //   for (var j = 0; j < 5; j++) {
-        //     if(data[row] != null){
-        //       data[row].row = row;
-        //       gp.data.push(data[row]);
-        //     }
-        //     row++;
-        //   };
-        //   vm.hotelRoomList.push(gp);
-        // }
-      }
-    });
+    // roomCheckServices.getHotelRoomList(vm.queryHotelRoom).then(function (response) {
+    //   if(response.data.code == "200"){
+    //     vm.hotelRoomList = [];
+    //
+    //     // var hrl = response.data.body.data;
+    //     // var dhrl={};
+    //     // var data = [];
+    //     // for (var i = hrl.length - 1; i >= 0; i--) {
+    //     //     var dhrl=hrl[i];
+    //     //     dhrl.issel=false;
+    //     //     data.push(dhrl)
+    //     // };
+    //
+    //
+    //     vm.hotelRoomList = response.data.body.data;
+    //
+    //     // var row = 0;
+    //     // var count = data.length;
+    //     // var group = count / 5;
+    //     // for (var i = 0;i< group; i++) {
+    //     //   var gp = {
+    //     //     item : i,
+    //     //     data : []
+    //     //   };
+    //     //   for (var j = 0; j < 5; j++) {
+    //     //     if(data[row] != null){
+    //     //       data[row].row = row;
+    //     //       gp.data.push(data[row]);
+    //     //     }
+    //     //     row++;
+    //     //   };
+    //     //   vm.hotelRoomList.push(gp);
+    //     // }
+    //   }
+    // });
   }
 
   //房间类型查询
@@ -233,10 +273,10 @@ app.controller('settledoutmain',['$scope','$http','dialog','roomCheckServices', 
           //   return true;
           // }
           // return false;
-          if(data != null && data.code=="200"){
+          if(data != null){
             vm.queryRoomClick();
-            vm.getCustomerInOutNum();
-            vm.getRoomStatic();
+            // vm.getCustomerInOutNum();
+            // vm.getRoomStatic();
             dialog.notify('入住成功！', 'success');
           }
         }
@@ -375,15 +415,15 @@ app.controller('settledoutmain',['$scope','$http','dialog','roomCheckServices', 
   }
 
   document.oncontextmenu=function(event) {
-    if (document.all) 
+    if (document.all)
       window.event.returnValue = false;// for IE
-    else 
+    else
       event.preventDefault();
   }
 
-  vm.checkWorking();
+  // vm.checkWorking();
   vm.getHotelRoomtypeList();
   vm.getHotelBuildList();
-  vm.getCustomerInOutNum();
-  vm.getRoomStatic();
+  // vm.getCustomerInOutNum();
+  // vm.getRoomStatic();
 }]);
