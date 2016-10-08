@@ -1,42 +1,53 @@
 'use strict';
 
-app.controller('setUpCtrl',['$scope','$http', 'dialog',function ($scope, $http, dialog) {
+app.controller('setUpCtrl',['$scope','$http', 'dialog','$sails',function ($scope, $http, dialog,$sails) {
   var vm = this;
 
   vm.jsondata = {
-    id:"",          //id主键值
-    hbegintime:0,       //停车优惠金额
-    hendtime:0,  //停车过夜费优惠金额
-    housceamt:0,    //客房优惠金额
-    hmendtime:0,   //停车过夜开始时间
-    endtime:0,     //停车过夜结束时间
+    hbegintime:0,
+    hendtime:0,
+    housceamt:0,
+    hmendtime:0,
+    endtime:0,
     hmhour:0
   };
 
   //优惠设置查询
   vm.getPreferential = function(){
-    $http.get(lpt_host + '/zeus/ws/hotel/hChargeconfig/getlist',{ params:{page: 1, rows: 10}}).success(function(data) {
-      if(data.code="200"){
-        if(data.body.data!=null)
-          vm.jsondata = data.body.data[0];
-      }
+      $sails.get("/hdiscount")
+    .success(function (data) {
+      vm.jsondata = data[0];
+    })
+    .error(function (data) {
+      alert('error');
     });
   }
 
   //新增OR修改
   vm.update = function(){
     if($scope.myForm.$valid){
-      $http.post(lpt_host + '/zeus/ws/hotel/hChargeconfig/saveorupdate', vm.jsondata)
-      .success(function(data){
-        if(data.code == "200"){
-          dialog.notify("保存成功!", 'success');
-        }
-        else{
-          dialog.notify(data.msg, 'error');
-        }
-      }).error(function(data) {
-        dialog.notify(data.msg, 'error');
+      if(vm.jsondata.id && vm.jsondata.id != "undefind"){
+        $sails.put("/hdiscount/"+vm.jsondata.id,vm.jsondata)
+      .success(function (data) {
+        vm.jsondata = data;
+        dialog.notify("保存成功!", 'success');
+      })
+      .error(function (data) {
+        alert('error');
       });
+    }else{
+      $sails.post("/hdiscount",vm.jsondata)
+    .success(function (data) {
+      vm.jsondata = data;
+      dialog.notify("保存成功!", 'success');
+    })
+    .error(function (data) {
+      alert('error');
+    });
+    }
+
+
+
     }
     $scope.myForm.submitted = true;
   }

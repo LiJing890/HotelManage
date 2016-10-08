@@ -148,6 +148,12 @@ angular.module('roomManageApp', [
         (function () {
             var currentAppModule = null;
             $rootScope.roomMenus = [];
+            var user = {
+              id:1,
+              username:"admin",
+                password:"123456"
+            };
+            $rootScope.user = user;
             // 获取本应用模块
 
             var loadAppModule = function () {
@@ -177,17 +183,18 @@ angular.module('roomManageApp', [
             //     }
             // }
             if ($location.path() == '/roomManage') {
-                if ($scope.roomMenus && $scope.roomMenus.length > 0) {
-                    settingService.getStatusByUserId(user.userid).then(function(datafr){
-                        if (datafr.status==200&&datafr.data.code==200) {
-                            if (datafr.data.body.dutystatus!=true) {
-                                $location.path("/roomManage/commute");
-                                return;
-                            }
-                        }
-                        $location.path($scope.roomMenus[0].href);
-                    });
-                }
+              $location.path('/roomManage/settledout');
+                // if ($scope.roomMenus && $scope.roomMenus.length > 0) {
+                //     settingService.getStatusByUserId(user.userid).then(function(datafr){
+                //         if (datafr.status==200&&datafr.data.code==200) {
+                //             if (datafr.data.body.dutystatus!=true) {
+                //                 $location.path("/roomManage/commute");
+                //                 return;
+                //             }
+                //         }
+                //         $location.path($scope.roomMenus[0].href);
+                //     });
+                // }
             }
         }
         locationChange();

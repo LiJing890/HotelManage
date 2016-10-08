@@ -2,7 +2,7 @@
 
 var app=angular.module('roomManageApp');
 
-app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','roomCheckServices',function ($document, $scope, $http, $filter, dialog, roomCheckServices) {
+app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','$sails',function ($document, $scope, $http, $filter, dialog, $sails) {
   var vm = this;
 
   vm.jsondata = {
@@ -49,71 +49,100 @@ app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','r
 
   //房间类型查询
   vm.getHotelRoomtypeList = function(){
-    roomCheckServices.getHotelRoomtypeList(vm.queryHotelRoomType).then(function (response) {
-      if(response.data.code == "200"){
-        vm.hotelRoomtype = response.data.body.data[0];
-        if(vm.hotelRoomtype!=null){
-          vm.jsondata.priceday = vm.hotelRoomtype.rtdprice;
-          vm.jsondata.pricehour = vm.hotelRoomtype.rthprice;
-          //默认设置
-          $scope.price = vm.jsondata.priceday;
-        }
+    $sails.get("/hroomtype/"+vm.queryHotelRoomType.id)
+  .success(function (data) {
+      vm.hotelRoomtype = data;
+      if(vm.hotelRoomtype!=null){
+        vm.jsondata.priceday = vm.hotelRoomtype.rtdprice;
+        vm.jsondata.pricehour = vm.hotelRoomtype.rthprice;
+        //默认设置
+        $scope.price = vm.jsondata.priceday;
       }
-    });
+  })
+  .error(function (data) {
+    alert('error');
+  });
+
+    // roomCheckServices.getHotelRoomtypeList(vm.queryHotelRoomType).then(function (response) {
+    //   if(response.data.code == "200"){
+    //     vm.hotelRoomtype = response.data.body.data[0];
+    //     if(vm.hotelRoomtype!=null){
+    //       vm.jsondata.priceday = vm.hotelRoomtype.rtdprice;
+    //       vm.jsondata.pricehour = vm.hotelRoomtype.rthprice;
+    //       //默认设置
+    //       $scope.price = vm.jsondata.priceday;
+    //     }
+    //   }
+    // });
   }
 
   //查询车辆信息
   vm.getParkingInfo = function(){
-    var wrcard = window.wrcard;
-    vm.jsondata.cardno = wrcard.getCardId(window.comPort);
+    // var wrcard = window.wrcard;
+    // vm.jsondata.cardno = wrcard.getCardId(window.comPort);
+    vm.jsondata.cardno = 'yd123456';
+
     if(vm.jsondata.cardno && vm.jsondata.cardno != "0"){
-      roomCheckServices.existCustomerByCardNo(vm.jsondata.cardno).then(function (response) {
-        if(response.data.code == "200"){
-          roomCheckServices.getParkingInfo(vm.jsondata.cardno).then(function (response) {
-            if(response.data.code == "200"){
-              if(vm.jsondata.tel == ""){
-                vm.jsondata.tel = response.data.body.telephonenumber;
-                vm.gehCustomerList(vm.jsondata.tel);
-              }
-              vm.jsondata.vehiclenumber = response.data.body.vehiclenumber;
-            }
-          });
-        }
-        else{
+      $sails.get("/hcard?cardno="+vm.jsondata.cardno)
+    .success(function (data) {
+        if(data[0].status==0){
+
+        }else{
           dialog.notify("该房卡已开房，请更换其他房卡！", 'error');
         }
-      });
+
+    })
+    .error(function (data) {
+      alert('error');
+    });
+
+      // roomCheckServices.existCustomerByCardNo(vm.jsondata.cardno).then(function (response) {
+      //   if(response.data.code == "200"){
+      //     roomCheckServices.getParkingInfo(vm.jsondata.cardno).then(function (response) {
+      //       if(response.data.code == "200"){
+      //         if(vm.jsondata.tel == ""){
+      //           vm.jsondata.tel = response.data.body.telephonenumber;
+      //           vm.gehCustomerList(vm.jsondata.tel);
+      //         }
+      //         vm.jsondata.vehiclenumber = response.data.body.vehiclenumber;
+      //       }
+      //     });
+      //   }
+      //   else{
+      //     dialog.notify("该房卡已开房，请更换其他房卡！", 'error');
+      //   }
+      // });
     }
   }
 
-  vm.gehCustomerList = function(tel){
-    if(tel && tel.length == 11){
-      var data = {
-        tel:tel,
-        rows:1,
-        page:1,
-        order: 'intime',
-        sort: 'DESC'
-      }
-      roomCheckServices.gehCustomerList(data).then(function (response) {
-        if(response.data.code == "200"){
-          var data = response.data.body.data;
-          if(data && data.length > 0){
-            vm.jsondata.cusname = data[0].cusname;
-            vm.jsondata.cussex = data[0].cussex;
-            vm.jsondata.cuscard = data[0].cuscard;
-            vm.jsondata.birthplace = data[0].birthplace;
-          }
-          else{
-            vm.jsondata.cusname = "";
-            // vm.jsondata.cussex = "";
-            vm.jsondata.cuscard = "";
-            vm.jsondata.birthplace = "";
-          }
-        }
-      });
-    }
-  }
+  // vm.gehCustomerList = function(tel){
+  //   if(tel && tel.length == 11){
+  //     var data = {
+  //       tel:tel,
+  //       rows:1,
+  //       page:1,
+  //       order: 'intime',
+  //       sort: 'DESC'
+  //     }
+  //     roomCheckServices.gehCustomerList(data).then(function (response) {
+  //       if(response.data.code == "200"){
+  //         var data = response.data.body.data;
+  //         if(data && data.length > 0){
+  //           vm.jsondata.cusname = data[0].cusname;
+  //           vm.jsondata.cussex = data[0].cussex;
+  //           vm.jsondata.cuscard = data[0].cuscard;
+  //           vm.jsondata.birthplace = data[0].birthplace;
+  //         }
+  //         else{
+  //           vm.jsondata.cusname = "";
+  //           // vm.jsondata.cussex = "";
+  //           vm.jsondata.cuscard = "";
+  //           vm.jsondata.birthplace = "";
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
 
   vm.costtypeChange = function(){
     if(vm.jsondata.costtype == "1"){
@@ -136,18 +165,19 @@ app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','r
   //新增OR修改
   vm.save = function(){
     if($scope.myForm.$valid){
-      var card = {
-        nRoom: vm.jsondata.roomno.substring(1),
-        Wstartdate:'000000000000',
-        Wenddate: $filter('formatDate')(vm.outime, 'YYYYMMDDHHmm'),
-        Vioce: '1',
-        Obt: '0',
-        Op: "8888",
-        nCode: '1',
-        jLift: '0'
-      };
-      var wrcard = window.wrcard;
-      var result = wrcard.w_Card(card.nRoom, card.Wstartdate, card.Wenddate, card.Vioce, card.Obt, card.Op, card.nCode, card.jLift);
+      // var card = {
+      //   nRoom: vm.jsondata.roomno.substring(1),
+      //   Wstartdate:'000000000000',
+      //   Wenddate: $filter('formatDate')(vm.outime, 'YYYYMMDDHHmm'),
+      //   Vioce: '1',
+      //   Obt: '0',
+      //   Op: "8888",
+      //   nCode: '1',
+      //   jLift: '0'
+      // };
+      // var wrcard = window.wrcard;
+      // var result = wrcard.w_Card(card.nRoom, card.Wstartdate, card.Wenddate, card.Vioce, card.Obt, card.Op, card.nCode, card.jLift);
+      var result = 1;
       if (result == 1) {
         // alert('写卡成功！');
         dialog.notify("写卡成功！", 'success');
@@ -158,19 +188,41 @@ app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','r
         return;
       }
       vm.jsondata.outime = vm.dateToString(vm.outime);
-      roomCheckServices.checkIn(vm.jsondata).then(function (response) {
-        if(response.data.code == "200"){
-          vm.printData();
-          $scope.closeThisDialog(response.data);
-        }
-        else{
-          dialog.notify(response.data.msg, 'error');
-          $scope.closeThisDialog(null);
-        }
-      });
+
+      $sails.post("/hcustomer",vm.jsondata)
+    .success(function (data) {
+      vm.roomData = {
+        id:vm.jsondata.h_r_id,
+        rstatus:2
+      }
+      $sails.put("/hroom/"+vm.roomData.id,vm.roomData)
+    .success(function (data) {
+      $scope.closeThisDialog(data);
+    })
+    .error(function (data) {
+      dialog.notify('操作失败', 'error');
+      $scope.closeThisDialog(null);
+    });
+    })
+    .error(function (data) {
+      dialog.notify('操作失败', 'error');
+      $scope.closeThisDialog(null);
+    });
+      // roomCheckServices.checkIn(vm.jsondata).then(function (response) {
+      //   if(response.data.code == "200"){
+          // vm.printData();
+      //     $scope.closeThisDialog(response.data);
+      //   }
+      //   else{
+      //     dialog.notify(response.data.msg, 'error');
+      //     $scope.closeThisDialog(null);
+      //   }
+      // });
     }
     $scope.myForm.submitted = true;
   }
+
+
 
   vm.cancel = function(){
     $scope.closeThisDialog(null);
@@ -302,23 +354,28 @@ app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','r
   }
 
   vm.readCard1 = function(){
-    var termb1 = window.termb;
-    var rtn = termb1.InitTermb(window.iDPort);
-    if(rtn==1){
-      vm.jsondata.cusname = termb1.GetPeopleName();
-      if (termb1.GetPeopleSex() == "男"){
-          vm.jsondata.cussex = 1;
-      }
-      else if (termb1.GetPeopleSex() == "女"){
-          vm.jsondata.cussex = 2;
-      }
-      vm.jsondata.cuscard = termb1.GetPeopleIDCode();
-      vm.jsondata.birthplace = termb1.GetPeopleAddress();
-    }
-    else{
-      // console.log('设备初始化失败');
-      dialog.notify("设备初始化失败！", 'error');
-    }
+    // var termb1 = window.termb;
+    // var rtn = termb1.InitTermb(window.iDPort);
+    vm.jsondata.cusname = '张三';
+    vm.jsondata.cussex = 1;
+    vm.jsondata.cuscard = '430321199101017878';
+    vm.jsondata.birthplace = '湖南湘潭';
+    // if(rtn==1){
+    //   vm.jsondata.cusname = termb1.GetPeopleName();
+    //   if (termb1.GetPeopleSex() == "男"){
+    //       vm.jsondata.cussex = 1;
+    //   }
+    //   else if (termb1.GetPeopleSex() == "女"){
+    //       vm.jsondata.cussex = 2;
+    //   }
+    //   vm.jsondata.cuscard = termb1.GetPeopleIDCode();
+    //   vm.jsondata.birthplace = termb1.GetPeopleAddress();
+    //
+    // }
+    // else{
+    //   // console.log('设备初始化失败');
+    //   dialog.notify("设备初始化失败！", 'error');
+    // }
   }
 
   vm.readCard2 = function(){
@@ -429,6 +486,6 @@ app.controller('roomcheckin',['$document','$scope','$http','$filter','dialog','r
   vm.jsondata.rtname = $scope.roominfo.rtname;
   vm.jsondata.intime = vm.curentTime();
   vm.outime = vm.defTime();
-  vm.getMaxSerialNumber();
+  // vm.getMaxSerialNumber();
   vm.getHotelRoomtypeList();
 }]);

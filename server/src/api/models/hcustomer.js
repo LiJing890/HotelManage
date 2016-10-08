@@ -15,7 +15,7 @@ export default class extends BaseModel {
 
   static tableName = 'hcustomer';
   static attributes = {
-        id: {type: 'integer', primaryKey: true, autoIncrement: true},//停车场Id
+        id: {type: 'integer', primaryKey: true, autoIncrement: true},//Id
         h_r_id: {type: 'string', unique: true,required:true},//房间ID
         cusname: {type: 'string'},//客户姓名
         cussex: {type: 'string',required:true},//客户性别
